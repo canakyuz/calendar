@@ -1,14 +1,28 @@
 {
-  "name": "expo-calendar",
+  "name": "@canakyuz/expo-calendar",
   "main": "expo-router/entry",
   "license": "0BSD",
   "version": "1.0.0",
+  "description": "Expo ile oluşturulmuş özelleştirilebilir takvim uygulaması",
+  "author": "Can Akyuz <canakyuz23@outlook.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/canakyuz/expo-calendar.git"
+  },
+  "keywords": [
+    "expo",
+    "calendar",
+    "react-native",
+    "takvim"
+  ],
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "prepare-publish": "npm version patch",
+    "publish": "npm publish"
   },
   "jest": {
     "preset": "jest-expo"
@@ -40,5 +54,17 @@
     "react-test-renderer": "18.3.1",
     "typescript": "~5.3.3"
   },
-  "private": true
+  "private": true,
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "files": [
+    "app/",
+    "components/",
+    "constants/",
+    "assets/images/",
+    "assets/fonts/",
+    "LICENSE",
+    "README.md"
+  ]
 }
