@@ -2,7 +2,7 @@
   "name": "@canakyuz/expo-calendar",
   "main": "expo-router/entry",
   "license": "0BSD",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Expo ile oluşturulmuş özelleştirilebilir takvim uygulaması",
   "author": "Can Akyuz <canakyuz23@outlook.com>",
   "repository": {
