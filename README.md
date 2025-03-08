@@ -1,10 +1,8 @@
 # Expo Calendar
 
-![Logo Görseli](./assets/docs/logo.png)
-
 Expo ile oluşturulmuş, özelleştirilebilir ve kullanımı kolay bir takvim uygulaması.
 
-![Banner Görseli](./assets/docs/banner.png)
+![Banner Görseli](./assets/docs/index.png)
 
 ## Kurulum
 
@@ -59,7 +57,7 @@ export default function App() {
 }
 ```
 
-![Kod Örneği Görseli](./assets/docs/code-example.png)
+![Kod Örneği Görseli](./assets/docs/basic.png)
 
 ### Basit Kullanım Örneği
 
@@ -90,7 +88,7 @@ const styles = StyleSheet.create({
 Uygulamanın farklı modlarını gösteren ekran görüntüleri:
 
 ### Ay Görünümü
-![Ay Görünümü](./assets/docs/month.png)
+![Ay Görünümü](./assets/docs/monthh.png)
 
 ```jsx
 import React from 'react';
@@ -110,7 +108,7 @@ export default function MonthViewExample() {
 ```
 
 ### Hafta Görünümü
-![Hafta Görünümü](./assets/docs/week-view.png)
+![Hafta Görünümü](./assets/docs/week.png)
 
 ```jsx
 import React from 'react';
@@ -130,7 +128,7 @@ export default function WeekViewExample() {
 ```
 
 ### Gün Görünümü
-![Gün Görünümü](./assets/docs/day-view.png)
+![Gün Görünümü](./assets/docs/day.png)
 
 ```jsx
 import React from 'react';
@@ -152,7 +150,7 @@ export default function DayViewExample() {
 ## Özellikler
 
 ### Tarih Seçme
-![Tarih Seçme Özelliği](./assets/docs/date-selection.png)
+![Tarih Seçme Özelliği](./assets/docs/basic.png)
 Günleri tıklayarak seçebilirsiniz
 
 ```jsx
@@ -182,7 +180,7 @@ export default function DateSelectionExample() {
 ```
 
 ### Özel Temalar
-![Özel Temalar Özelliği](./assets/docs/custom-themes.png)
+![Özel Temalar Özelliği](./assets/docs/index.png)
 Görünümü projenize uygun olarak kişiselleştirebilirsiniz
 
 ```jsx
@@ -212,7 +210,7 @@ export default function CustomThemeExample() {
 ```
 
 ### Etkinlik İşaretleme
-![Etkinlik İşaretleme Özelliği](./assets/docs/event-marking.png)
+![Etkinlik İşaretleme Özelliği](./assets/docs/monthh.png)
 Özel tarihleri vurgulayabilirsiniz
 
 ```jsx
@@ -252,7 +250,7 @@ export default function EventMarkingExample() {
 ```
 
 ### Çoklu Görünüm
-![Çoklu Görünüm Özelliği](./assets/docs/multiple-views.png)
+![Çoklu Görünüm Özelliği](./assets/docs/multiple.png)
 Gün, hafta ve ay görünümleri arasında kolayca geçiş yapabilirsiniz
 
 ```jsx
@@ -302,7 +300,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Expo ile Tam Uyumlu
-![Expo Uyumluluğu](./assets/docs/expo-compatibility.png)
+
 Expo tabanlı projelerde sorunsuz çalışır
 
 ```jsx
@@ -331,7 +329,7 @@ export default function ExpoCompatibilityExample() {
 | initialDate | String | Today | Takvimin açılış tarihi |
 | viewMode | String | 'month' | Görünüm modu ('day', 'week', 'month') |
 
-![Parametreler Görseli](./assets/docs/parameters-example.png)
+![Parametreler Görseli](./assets/docs/index.png)
 
 ```jsx
 import React from 'react';
@@ -379,7 +377,7 @@ npm install
 npm start
 ```
 
-![Geliştirme Ortamı](./assets/docs/development-environment.png)
+![Geliştirme Ortamı](./assets/docs/index.png)
 
 ### Katkı Sağlama
 
@@ -387,7 +385,7 @@ Projeye katkı sağlamak istiyorsanız:
 
 ```bash
 # Repoyu klonlayın 
-git clone https://github.com/kullanıcıadınız/expo-calendar.git
+git clone https://github.com/canakyuz/expo-calendar.git
 
 # Proje dizinine gidin
 cd expo-calendar
@@ -408,98 +406,61 @@ git commit -m "Yeni özellik: ..."
 git push origin yeni-ozellik
 ```
 
-## Topluluk & Destek
+## Paket Yayınlama
 
-![Topluluk Görseli](./assets/docs/community.png)
+Bu paket GitHub Packages'a yayınlanmaktadır. Yayınlama için aşağıdaki adımları izleyin:
+
+### GitHub Token Oluşturma
+
+1. GitHub'a giriş yapın
+2. Profil menüsünden "Settings" > "Developer settings" > "Personal access tokens" seçeneğine gidin
+3. "Generate new token" butonuna tıklayın
+4. Tokena bir isim verin ve aşağıdaki izinleri seçin:
+   - `repo` (tüm alt izinler)
+   - `read:packages`
+   - `write:packages`
+   - `delete:packages`
+5. Oluşturulan tokeni güvenli bir yere kaydedin
+
+### NPM Yapılandırması
+
+Projenizde `.npmrc` dosyasını aşağıdaki gibi düzenleyin:
+
+```
+@canakyuz:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+```
+
+### Paketi Yayınlama
+
+```bash
+# Versiyonu arttırın
+npm version patch  # Küçük güncellemeler için
+npm version minor  # Yeni özellikler için 
+npm version major  # Büyük değişiklikler için
+
+# Paketi yayınlayın
+npm publish
+```
+
+## Topluluk & Destek
 
 Sorularınız için GitHub Issues veya aşağıdaki iletişim kanallarını kullanabilirsiniz:
 
-- [GitHub Issues](https://github.com/kullanıcıadınız/expo-calendar/issues)
-- [Twitter](https://twitter.com/kullanıcıadınız)
-- [Discord Kanalımız](https://discord.gg/expo-calendar)
+- [GitHub Issues](https://github.com/canakyuz/expo-calendar/issues)
+- Twitter: [@canakyuz](https://twitter.com/canakyuz)
+- E-posta: canakyuz23@outlook.com
 
-### Topluluk Örneği
+## Güncel Versiyon
 
-Topluluğa soru sormak için:
+Şu anki versiyon: **1.0.3**
 
-```jsx
-// GitHub issue örneği:
-/**
- * Başlık: Takvim bileşeninde özel etkinlik ekleme
- * 
- * Merhaba,
- * 
- * Takvim bileşenine özel etkinlikler eklemek istiyorum.
- * Örneğin, belirli bir tarihe tıklandığında o güne özel etkinlik
- * detaylarını göstermek istiyorum. Bunu nasıl yapabilirim?
- * 
- * Teşekkürler!
- */
-
-// Kod örneği:
-import React, { useState } from 'react';
-import { View, Modal, Text, Button } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
-
-export default function EventExample() {
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  
-  // Örnek etkinlikler
-  const events = {
-    '2023-10-15': [
-      { title: 'Toplantı', time: '10:00' },
-      { title: 'Öğle Yemeği', time: '13:00' }
-    ],
-    '2023-10-20': [
-      { title: 'Doktor Randevusu', time: '14:30' }
-    ]
-  };
-
-  const handleDateSelect = (date) => {
-    setSelectedDate(date);
-    if (events[date]) {
-      setModalVisible(true);
-    }
-  };
-
-  return (
-    <View style={{ flex: 1 }}>
-      <Calendar 
-        onDateSelect={handleDateSelect}
-        highlightedDates={Object.keys(events).reduce((obj, date) => {
-          obj[date] = { marked: true, dotColor: 'blue' };
-          return obj;
-        }, {})}
-      />
-      
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <View style={{ width: '80%', backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
-            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-              {selectedDate} Etkinlikleri
-            </Text>
-            
-            {selectedDate && events[selectedDate]?.map((event, index) => (
-              <View key={index} style={{ marginBottom: 5 }}>
-                <Text>{event.time} - {event.title}</Text>
-              </View>
-            ))}
-            
-            <Button title="Kapat" onPress={() => setModalVisible(false)} />
-          </View>
-        </View>
-      </Modal>
-    </View>
-  );
-}
-```
+Son güncelleme: Mart 2024
 
 ## Lisans
 
-Bu proje 0BSD lisansı altında lisanslanmıştır. Daha fazla bilgi için `LICENSE` dosyasına bakın. 
+Bu proje [MIT License](./LICENSE) altında lisanslanmıştır.
+
+MIT lisansı, kullanıcıların yazılımı herhangi bir kısıtlama olmaksızın kullanma, kopyalama, değiştirme, birleştirme, yayınlama, dağıtma, alt lisanslama ve/veya satma hakkı tanıyan permisif bir lisanstır. Tek şartı, lisans ve telif hakkı bildiriminin yazılımın tüm kopyalarında veya önemli bölümlerinde bulundurulmasıdır.
+
+Lisansın tam metnini [LICENSE](./LICENSE) dosyasında bulabilirsiniz. 
