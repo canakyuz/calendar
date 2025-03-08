@@ -22,7 +22,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "prepare-publish": "npm version patch",
-    "publish": "npm publish"
+    "publish": "echo 'yayınlanıyor...'"
   },
   "jest": {
     "preset": "jest-expo"
