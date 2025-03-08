@@ -9,26 +9,13 @@ Expo ile oluşturulmuş, özelleştirilebilir ve kullanımı kolay bir takvim uy
 Paketi kurmak için aşağıdaki komutu kullanabilirsiniz:
 
 ```bash
-npm install @canakyuz/expo-calendar
+npm install @canakyuz/calendar
 ```
 
 veya
 
 ```bash
-yarn add @canakyuz/expo-calendar
-```
-
-## Kimlik Doğrulama ve Erişim
-
-Bu özel bir pakettir. Yükleme yapabilmek için:
-
-1. GitHub'da oturum açın.
-2. Paket sahibinden erişim isteyin.
-3. Aşağıdaki ayarları `.npmrc` dosyanıza ekleyin:
-
-```
-@canakyuz:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
+yarn add @canakyuz/calendar
 ```
 
 ## Kullanım
@@ -36,7 +23,7 @@ Bu özel bir pakettir. Yükleme yapabilmek için:
 Takvim bileşenini projenize aşağıdaki gibi ekleyebilirsiniz:
 
 ```jsx
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function App() {
   const handleDateSelect = (date) => {
@@ -64,7 +51,7 @@ export default function App() {
 ```jsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function BasicCalendarScreen() {
   return (
@@ -93,7 +80,7 @@ Uygulamanın farklı modlarını gösteren ekran görüntüleri:
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function MonthViewExample() {
   return (
@@ -113,7 +100,7 @@ export default function MonthViewExample() {
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function WeekViewExample() {
   return (
@@ -133,7 +120,7 @@ export default function WeekViewExample() {
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function DayViewExample() {
   return (
@@ -156,7 +143,7 @@ Günleri tıklayarak seçebilirsiniz
 ```jsx
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function DateSelectionExample() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -186,7 +173,7 @@ Görünümü projenize uygun olarak kişiselleştirebilirsiniz
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function CustomThemeExample() {
   // Koyu tema örneği
@@ -216,7 +203,7 @@ export default function CustomThemeExample() {
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function EventMarkingExample() {
   // Vurgulanacak tarihler ve özellikleri
@@ -256,7 +243,7 @@ Gün, hafta ve ay görünümleri arasında kolayca geçiş yapabilirsiniz
 ```jsx
 import React, { useState } from 'react';
 import { View, Button, StyleSheet } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function MultipleViewsExample() {
   const [currentView, setCurrentView] = useState('month');
@@ -307,7 +294,7 @@ Expo tabanlı projelerde sorunsuz çalışır
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function ExpoCompatibilityExample() {
   return (
@@ -334,7 +321,7 @@ export default function ExpoCompatibilityExample() {
 ```jsx
 import React from 'react';
 import { View } from 'react-native';
-import { Calendar } from '@canakyuz/expo-calendar';
+import { Calendar } from '@canakyuz/calendar';
 
 export default function ParametersExample() {
   // Tüm parametrelerin kullanım örneği
@@ -385,10 +372,10 @@ Projeye katkı sağlamak istiyorsanız:
 
 ```bash
 # Repoyu klonlayın 
-git clone https://github.com/canakyuz/expo-calendar.git
+git clone https://github.com/canakyuz/calendar.git
 
 # Proje dizinine gidin
-cd expo-calendar
+cd calendar
 
 # Bağımlılıkları yükleyin
 npm install
@@ -408,28 +395,7 @@ git push origin yeni-ozellik
 
 ## Paket Yayınlama
 
-Bu paket GitHub Packages'a yayınlanmaktadır. Yayınlama için aşağıdaki adımları izleyin:
-
-### GitHub Token Oluşturma
-
-1. GitHub'a giriş yapın
-2. Profil menüsünden "Settings" > "Developer settings" > "Personal access tokens" seçeneğine gidin
-3. "Generate new token" butonuna tıklayın
-4. Tokena bir isim verin ve aşağıdaki izinleri seçin:
-   - `repo` (tüm alt izinler)
-   - `read:packages`
-   - `write:packages`
-   - `delete:packages`
-5. Oluşturulan tokeni güvenli bir yere kaydedin
-
-### NPM Yapılandırması
-
-Projenizde `.npmrc` dosyasını aşağıdaki gibi düzenleyin:
-
-```
-@canakyuz:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-```
+Bu paket npm'de yayınlanmaktadır. Yayınlama için aşağıdaki adımları izleyin:
 
 ### Paketi Yayınlama
 
@@ -447,7 +413,7 @@ npm publish
 
 Sorularınız için GitHub Issues veya aşağıdaki iletişim kanallarını kullanabilirsiniz:
 
-- [GitHub Issues](https://github.com/canakyuz/expo-calendar/issues)
+- [GitHub Issues](https://github.com/canakyuz/calendar/issues)
 - Twitter: [@canakyuz](https://twitter.com/canakyuz)
 - E-posta: canakyuz23@outlook.com
 

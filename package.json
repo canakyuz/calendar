@@ -1,5 +1,5 @@
 {
-  "name": "@canakyuz/expo-calendar",
+  "name": "@canakyuz/calendar",
   "main": "expo-router/entry",
   "license": "MIT",
   "version": "1.0.3",
@@ -7,7 +7,7 @@
   "author": "Can Akyuz <canakyuz23@outlook.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/canakyuz/expo-calendar.git"
+    "url": "git+https://github.com/canakyuz/calendar.git"
   },
   "keywords": [
     "expo",
@@ -22,7 +22,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "prepare-publish": "npm version patch",
-    "publish": "echo 'yayınlanıyor...'"
+    "publish-pkg": "npm publish"
   },
   "jest": {
     "preset": "jest-expo"
@@ -55,8 +55,8 @@
     "typescript": "~5.3.3"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "files": [
     "app/",
