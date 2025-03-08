@@ -17,6 +17,9 @@ export interface ThemeProps {
   selectedDayColor?: string;
   todayColor?: string;
   taskDefaultColor?: string;
+  dayTextColor?: string;
+  dayBackgroundColor?: string;
+  selectedDayTextColor?: string;
 }
 
 export interface DailyViewProps {
@@ -85,6 +88,26 @@ export interface CalendarProps {
   onDatePress?: (date: Date) => void;
   view?: 'daily' | 'weekly' | 'monthly' | 'agenda';
   theme?: ThemeProps;
+  
+  logoSource?: any;
+  notificationIcon?: React.ReactNode;
+  renderLogo?: () => React.ReactNode;
+  renderNotification?: () => React.ReactNode;
+  renderHeader?: () => React.ReactNode;
+  hideNotification?: boolean;
+  hideLogo?: boolean;
+  
+  minimalMode?: boolean;
+  renderDayContent?: (date: Date, events: Task[]) => React.ReactNode;
+  showHeader?: boolean;
+  showNavigation?: boolean;
+  compact?: boolean;
+  
+  // Üst bilgi alanları
+  leftContent?: React.ReactNode;
+  rightContent?: React.ReactNode;
+  onLeftPress?: () => void;
+  onRightPress?: () => void;
 }
 
 export interface CalendarTabViewProps {

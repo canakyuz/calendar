@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { DateSelectorProps } from './types';
-import { FontAwesome } from '@expo/vector-icons';
+import * as Icons from '@expo/vector-icons';
 
 // Ayları formatlama
 const MONTHS = [
-  'January', 'February', 'March', 'April', 
-  'May', 'June', 'July', 'August', 
-  'September', 'October', 'November', 'December'
+  'Ocak', 'Şubat', 'Mart', 'Nisan', 
+  'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 
+  'Eylül', 'Ekim', 'Kasım', 'Aralık'
 ];
 
 const DateSelector: React.FC<DateSelectorProps> = ({
@@ -30,7 +30,6 @@ const DateSelector: React.FC<DateSelectorProps> = ({
   const openModal = () => {
     setTempDate(new Date(date));
     setModalVisible(true);
-    setView('days');
   };
   
   // Modal'ı kapat
@@ -38,209 +37,257 @@ const DateSelector: React.FC<DateSelectorProps> = ({
     setModalVisible(false);
   };
   
-  // Tarihi onayla
+  // Tarihi onayla ve modal'ı kapat
   const confirmDate = () => {
     onDateChange(tempDate);
     closeModal();
   };
   
-  // Günleri oluştur
+  // Günleri render et
   const renderDays = () => {
+    const days = [];
     const year = tempDate.getFullYear();
     const month = tempDate.getMonth();
     
     // Ayın ilk günü
     const firstDay = new Date(year, month, 1);
-    const firstDayOfWeek = firstDay.getDay();
+    
+    // Haftanın günü (0: Pazar, 1: Pazartesi, ..., 6: Cumartesi)
+    let firstDayOfWeek = firstDay.getDay();
+    // Pazartesi'yi haftanın ilk günü olarak ayarla (0: Pazartesi)
+    firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
     
     // Ayın gün sayısı
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // Günleri oluştur
-    const days = [];
-    const daysArray = [];
-    
     // Önceki ayın günleri
+    const prevMonth = new Date(year, month, 0);
+    const prevMonthDays = prevMonth.getDate();
+    
     for (let i = 0; i < firstDayOfWeek; i++) {
-      days.push(null);
+      const day = prevMonthDays - firstDayOfWeek + i + 1;
+      const prevDate = new Date(year, month - 1, day);
+      
+      days.push(
+        <TouchableOpacity 
+          key={`prev-${i}`}
+          style={[
+            styles.dayButton,
+            styles.otherMonthDay,
+            minimumDate && prevDate < minimumDate && styles.disabledDay
+          ]}
+          onPress={() => {
+            if (minimumDate && prevDate < minimumDate) return;
+            const newDate = new Date(tempDate);
+            newDate.setMonth(month - 1);
+            newDate.setDate(day);
+            setTempDate(newDate);
+          }}
+          disabled={minimumDate ? prevDate < minimumDate : false}
+        >
+          <Text style={[
+            styles.dayText,
+            styles.otherMonthText,
+            minimumDate && prevDate < minimumDate && styles.disabledText
+          ]}>
+            {day}
+          </Text>
+        </TouchableOpacity>
+      );
     }
     
     // Bu ayın günleri
     for (let i = 1; i <= daysInMonth; i++) {
-      days.push(i);
+      const currentDate = new Date(year, month, i);
+      const isToday = 
+        currentDate.getDate() === new Date().getDate() &&
+        currentDate.getMonth() === new Date().getMonth() &&
+        currentDate.getFullYear() === new Date().getFullYear();
+      
+      const isSelected = 
+        currentDate.getDate() === tempDate.getDate() &&
+        currentDate.getMonth() === tempDate.getMonth() &&
+        currentDate.getFullYear() === tempDate.getFullYear();
+      
+      days.push(
+        <TouchableOpacity 
+          key={`current-${i}`}
+          style={[
+            styles.dayButton,
+            isToday && styles.todayButton,
+            isSelected && styles.selectedDayButton,
+            theme.selectedDayColor && isSelected && { backgroundColor: theme.selectedDayColor },
+            minimumDate && currentDate < minimumDate && styles.disabledDay,
+            maximumDate && currentDate > maximumDate && styles.disabledDay,
+          ]}
+          onPress={() => {
+            if (
+              (minimumDate && currentDate < minimumDate) ||
+              (maximumDate && currentDate > maximumDate)
+            ) return;
+            
+            const newDate = new Date(tempDate);
+            newDate.setDate(i);
+            setTempDate(newDate);
+          }}
+          disabled={
+            (minimumDate ? currentDate < minimumDate : false) ||
+            (maximumDate ? currentDate > maximumDate : false)
+          }
+        >
+          <Text style={[
+            styles.dayText,
+            isToday && styles.todayText,
+            isSelected && styles.selectedDayText,
+            theme.selectedDayTextColor && isSelected && { color: theme.selectedDayTextColor },
+            minimumDate && currentDate < minimumDate && styles.disabledText,
+            maximumDate && currentDate > maximumDate && styles.disabledText,
+          ]}>
+            {i}
+          </Text>
+        </TouchableOpacity>
+      );
     }
     
-    // 7'şerli grupla
-    for (let i = 0; i < days.length; i += 7) {
-      daysArray.push(days.slice(i, i + 7));
-    }
-    
-    return (
-      <View style={styles.daysContainer}>
-        {/* Haftanın günleri */}
-        <View style={styles.weekdayHeader}>
-          {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day, index) => (
-            <Text key={index} style={styles.weekdayText}>{day}</Text>
-          ))}
-        </View>
+    // Sonraki ayın günleri
+    const remainingDays = 7 - (days.length % 7);
+    if (remainingDays < 7) {
+      for (let i = 1; i <= remainingDays; i++) {
+        const nextDate = new Date(year, month + 1, i);
         
-        {/* Günler */}
-        {daysArray.map((week, weekIndex) => (
-          <View key={weekIndex} style={styles.weekRow}>
-            {week.map((day, dayIndex) => {
-              if (day === null) {
-                return <View key={dayIndex} style={styles.emptyDay} />;
-              }
-              
-              const dayDate = new Date(year, month, day);
-              const isToday = dayDate.toDateString() === new Date().toDateString();
-              const isSelected = dayDate.toDateString() === tempDate.toDateString();
-              
-              // Minimum ve maximum tarih kontrolü
-              const isDisabled = 
-                (minimumDate && dayDate < minimumDate) || 
-                (maximumDate && dayDate > maximumDate);
-              
-              return (
-                <TouchableOpacity
-                  key={dayIndex}
-                  style={[
-                    styles.dayButton,
-                    isToday && styles.todayButton,
-                    isSelected && styles.selectedDayButton,
-                    isDisabled && styles.disabledDay,
-                  ]}
-                  onPress={() => {
-                    if (!isDisabled) {
-                      setTempDate(dayDate);
-                    }
-                  }}
-                  disabled={isDisabled}
-                >
-                  <Text style={[
-                    styles.dayText,
-                    isToday && styles.todayText,
-                    isSelected && styles.selectedDayText,
-                    isDisabled && styles.disabledText,
-                  ]}>
-                    {day}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        ))}
-      </View>
-    );
-  };
-  
-  // Ayları oluştur
-  const renderMonths = () => {
-    return (
-      <View style={styles.monthsContainer}>
-        {MONTHS.map((month, index) => {
-          const monthDate = new Date(tempDate.getFullYear(), index, 1);
-          const isCurrentMonth = index === new Date().getMonth() && tempDate.getFullYear() === new Date().getFullYear();
-          const isSelected = index === tempDate.getMonth();
-          
-          // Minimum ve maximum tarih kontrolü
-          const isDisabled = 
-            (minimumDate && monthDate < new Date(minimumDate.getFullYear(), minimumDate.getMonth(), 1)) || 
-            (maximumDate && monthDate > new Date(maximumDate.getFullYear(), maximumDate.getMonth(), 1));
-          
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.monthButton,
-                isCurrentMonth && styles.currentMonthButton,
-                isSelected && styles.selectedMonthButton,
-                isDisabled && styles.disabledMonth,
-              ]}
-              onPress={() => {
-                if (!isDisabled) {
-                  setTempDate(new Date(tempDate.getFullYear(), index, tempDate.getDate()));
-                  setView('days');
-                }
-              }}
-              disabled={isDisabled}
-            >
-              <Text style={[
-                styles.monthText,
-                isCurrentMonth && styles.currentMonthText,
-                isSelected && styles.selectedMonthText,
-                isDisabled && styles.disabledText,
-              ]}>
-                {month}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    );
-  };
-  
-  // Yılları oluştur
-  const renderYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    
-    // Önceki 10 yıl ve sonraki 10 yıl
-    for (let i = currentYear - 10; i <= currentYear + 10; i++) {
-      years.push(i);
+        days.push(
+          <TouchableOpacity 
+            key={`next-${i}`}
+            style={[
+              styles.dayButton,
+              styles.otherMonthDay,
+              maximumDate && nextDate > maximumDate && styles.disabledDay
+            ]}
+            onPress={() => {
+              if (maximumDate && nextDate > maximumDate) return;
+              const newDate = new Date(tempDate);
+              newDate.setMonth(month + 1);
+              newDate.setDate(i);
+              setTempDate(newDate);
+            }}
+            disabled={maximumDate ? nextDate > maximumDate : false}
+          >
+            <Text style={[
+              styles.dayText,
+              styles.otherMonthText,
+              maximumDate && nextDate > maximumDate && styles.disabledText
+            ]}>
+              {i}
+            </Text>
+          </TouchableOpacity>
+        );
+      }
     }
     
-    return (
-      <View style={styles.yearsContainer}>
-        {years.map((year, index) => {
-          const isCurrentYear = year === currentYear;
-          const isSelected = year === tempDate.getFullYear();
-          
-          // Minimum ve maximum tarih kontrolü
-          const isDisabled = 
-            (minimumDate && year < minimumDate.getFullYear()) || 
-            (maximumDate && year > maximumDate.getFullYear());
-          
-          return (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.yearButton,
-                isCurrentYear && styles.currentYearButton,
-                isSelected && styles.selectedYearButton,
-                isDisabled && styles.disabledYear,
-              ]}
-              onPress={() => {
-                if (!isDisabled) {
-                  setTempDate(new Date(year, tempDate.getMonth(), tempDate.getDate()));
-                  setView('months');
-                }
-              }}
-              disabled={isDisabled}
-            >
-              <Text style={[
-                styles.yearText,
-                isCurrentYear && styles.currentYearText,
-                isSelected && styles.selectedYearText,
-                isDisabled && styles.disabledText,
-              ]}>
-                {year}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    );
+    return days;
+  };
+  
+  // Ayları render et
+  const renderMonths = () => {
+    const months = [];
+    
+    for (let i = 0; i < 12; i++) {
+      const monthDate = new Date(tempDate.getFullYear(), i, 1);
+      const isCurrentMonth = i === tempDate.getMonth();
+      
+      months.push(
+        <TouchableOpacity 
+          key={i}
+          style={[
+            styles.monthButton,
+            isCurrentMonth && styles.selectedMonthButton,
+            theme.selectedDayColor && isCurrentMonth && { backgroundColor: theme.selectedDayColor },
+            minimumDate && monthDate < minimumDate && styles.disabledDay,
+            maximumDate && new Date(tempDate.getFullYear(), i + 1, 0) > maximumDate && styles.disabledDay,
+          ]}
+          onPress={() => {
+            const newDate = new Date(tempDate);
+            newDate.setMonth(i);
+            setTempDate(newDate);
+            setView('days');
+          }}
+          disabled={
+            (minimumDate && monthDate < minimumDate) ||
+            (maximumDate && new Date(tempDate.getFullYear(), i + 1, 0) > maximumDate)
+          }
+        >
+          <Text style={[
+            styles.monthText,
+            isCurrentMonth && styles.selectedMonthText,
+            theme.selectedDayTextColor && isCurrentMonth && { color: theme.selectedDayTextColor },
+            minimumDate && monthDate < minimumDate && styles.disabledText,
+            maximumDate && new Date(tempDate.getFullYear(), i + 1, 0) > maximumDate && styles.disabledText,
+          ]}>
+            {MONTHS[i]}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+    
+    return months;
+  };
+  
+  // Yılları render et
+  const renderYears = () => {
+    const years = [];
+    const currentYear = tempDate.getFullYear();
+    const startYear = currentYear - 5;
+    const endYear = currentYear + 5;
+    
+    for (let i = startYear; i <= endYear; i++) {
+      const isCurrentYear = i === currentYear;
+      const yearDate = new Date(i, 0, 1);
+      
+      years.push(
+        <TouchableOpacity 
+          key={i}
+          style={[
+            styles.yearButton,
+            isCurrentYear && styles.selectedYearButton,
+            theme.selectedDayColor && isCurrentYear && { backgroundColor: theme.selectedDayColor },
+            minimumDate && yearDate < minimumDate && styles.disabledDay,
+            maximumDate && new Date(i, 11, 31) > maximumDate && styles.disabledDay,
+          ]}
+          onPress={() => {
+            const newDate = new Date(tempDate);
+            newDate.setFullYear(i);
+            setTempDate(newDate);
+            setView('months');
+          }}
+          disabled={
+            (minimumDate && yearDate < minimumDate) ||
+            (maximumDate && new Date(i, 11, 31) > maximumDate)
+          }
+        >
+          <Text style={[
+            styles.yearText,
+            isCurrentYear && styles.selectedYearText,
+            theme.selectedDayTextColor && isCurrentYear && { color: theme.selectedDayTextColor },
+            minimumDate && yearDate < minimumDate && styles.disabledText,
+            maximumDate && new Date(i, 11, 31) > maximumDate && styles.disabledText,
+          ]}>
+            {i}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
+    
+    return years;
   };
   
   return (
     <View style={styles.container}>
       <TouchableOpacity 
-        style={styles.button} 
+        style={[styles.button, theme.backgroundColor && { backgroundColor: theme.backgroundColor }]} 
         onPress={openModal}
       >
         <Text style={styles.buttonText}>{formatDate(date)}</Text>
-        <FontAwesome name="calendar" size={16} color="#666" />
+        <Icons.AntDesign name="calendar" size={16} color="#666" />
       </TouchableOpacity>
       
       <Modal
@@ -249,8 +296,8 @@ const DateSelector: React.FC<DateSelectorProps> = ({
         animationType="fade"
         onRequestClose={closeModal}
       >
-        <TouchableOpacity
-          style={styles.modalBackground}
+        <TouchableOpacity 
+          style={styles.modalOverlay}
           activeOpacity={1}
           onPress={closeModal}
         >
@@ -259,39 +306,70 @@ const DateSelector: React.FC<DateSelectorProps> = ({
               styles.modalContent,
               theme.backgroundColor && { backgroundColor: theme.backgroundColor }
             ]}
+            // Modal içeriğine tıklama
+            onTouchStart={(e) => e.stopPropagation()}
           >
-            {/* Başlık */}
             <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={() => setView('years')}>
-                <Text style={styles.yearTitle}>{tempDate.getFullYear()}</Text>
+              <TouchableOpacity style={styles.titleButton} onPress={() => setView('years')}>
+                <Text style={styles.modalTitle}>
+                  {view === 'days' 
+                    ? `${MONTHS[tempDate.getMonth()]} ${tempDate.getFullYear()}`
+                    : view === 'months'
+                      ? `${tempDate.getFullYear()}`
+                      : 'Yıl Seçimi'
+                  }
+                </Text>
               </TouchableOpacity>
-              
+                
+              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                <Icons.AntDesign name="close" size={16} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.calendarView}>
               {view === 'days' && (
-                <TouchableOpacity onPress={() => setView('months')}>
-                  <Text style={styles.monthTitle}>{MONTHS[tempDate.getMonth()]}</Text>
-                </TouchableOpacity>
+                <>
+                  <View style={styles.weekdayHeader}>
+                    {['Pt', 'Sa', 'Çr', 'Pr', 'Cu', 'Ct', 'Pz'].map((day, index) => (
+                      <Text key={index} style={styles.weekdayText}>
+                        {day}
+                      </Text>
+                    ))}
+                  </View>
+                  
+                  <View style={styles.daysContainer}>
+                    {renderDays()}
+                  </View>
+                </>
               )}
               
-              <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
-                <FontAwesome name="times" size={16} color="#666" />
-              </TouchableOpacity>
-            </View>
-            
-            {/* İçerik */}
-            <View style={styles.modalBody}>
-              {view === 'days' && renderDays()}
-              {view === 'months' && renderMonths()}
-              {view === 'years' && renderYears()}
-            </View>
-            
-            {/* Alt butonlar */}
-            <View style={styles.modalFooter}>
-              <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
-                <Text style={styles.cancelButtonText}>İptal</Text>
-              </TouchableOpacity>
+              {view === 'months' && (
+                <View style={styles.monthsContainer}>
+                  {renderMonths()}
+                </View>
+              )}
               
-              <TouchableOpacity style={styles.confirmButton} onPress={confirmDate}>
-                <Text style={styles.confirmButtonText}>Tamam</Text>
+              {view === 'years' && (
+                <View style={styles.yearsContainer}>
+                  {renderYears()}
+                </View>
+              )}
+            </View>
+            
+            <View style={styles.modalFooter}>
+              <TouchableOpacity 
+                style={[
+                  styles.confirmButton,
+                  theme.selectedDayColor && { backgroundColor: theme.selectedDayColor }
+                ]} 
+                onPress={confirmDate}
+              >
+                <Text style={[
+                  styles.confirmButtonText,
+                  theme.selectedDayTextColor && { color: theme.selectedDayTextColor }
+                ]}>
+                  Onayla
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -306,143 +384,112 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   button: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 8,
-    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#333',
   },
-  modalBackground: {
+  modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    width: '90%',
-    maxWidth: 360,
     backgroundColor: '#fff',
     borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 5,
+    width: '80%',
+    maxHeight: '80%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowRadius: 4,
+    elevation: 5,
+    overflow: 'hidden',
   },
   modalHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#eee',
+    padding: 15,
   },
-  yearTitle: {
+  titleButton: {
+    flex: 1,
+  },
+  modalTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
-  monthTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   closeButton: {
-    padding: 4,
+    padding: 5,
   },
-  modalBody: {
-    padding: 16,
-  },
-  modalFooter: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  cancelButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
-  },
-  cancelButtonText: {
-    color: '#666',
-    fontSize: 14,
-  },
-  confirmButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#007bff',
-    borderRadius: 4,
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  daysContainer: {
-    width: '100%',
+  calendarView: {
+    padding: 10,
   },
   weekdayHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   weekdayText: {
-    width: 36,
+    flex: 1,
     textAlign: 'center',
-    fontSize: 14,
-    fontWeight: 'bold',
     color: '#666',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
-  weekRow: {
+  daysContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 8,
+    flexWrap: 'wrap',
   },
   dayButton: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
+    width: '14.28%',
+    height: 40,
     justifyContent: 'center',
-    borderRadius: 18,
-  },
-  todayButton: {
-    backgroundColor: '#f0f0f0',
-  },
-  selectedDayButton: {
-    backgroundColor: '#007bff',
-  },
-  disabledDay: {
-    opacity: 0.3,
+    alignItems: 'center',
+    borderRadius: 20,
   },
   dayText: {
     fontSize: 14,
     color: '#333',
   },
+  otherMonthDay: {
+    opacity: 0.5,
+  },
+  otherMonthText: {
+    color: '#999',
+  },
+  todayButton: {
+    backgroundColor: '#f0f0f0',
+  },
   todayText: {
     fontWeight: 'bold',
+  },
+  selectedDayButton: {
+    backgroundColor: '#007bff',
   },
   selectedDayText: {
     color: '#fff',
     fontWeight: 'bold',
   },
-  disabledText: {
-    color: '#999',
+  disabledDay: {
+    opacity: 0.3,
   },
-  emptyDay: {
-    width: 36,
-    height: 36,
+  disabledText: {
+    color: '#ccc',
   },
   monthsContainer: {
     flexDirection: 'row',
@@ -451,27 +498,18 @@ const styles = StyleSheet.create({
   },
   monthButton: {
     width: '30%',
-    paddingVertical: 12,
-    alignItems: 'center',
+    height: 45,
     justifyContent: 'center',
-    marginBottom: 8,
-    borderRadius: 4,
-  },
-  currentMonthButton: {
-    backgroundColor: '#f0f0f0',
-  },
-  selectedMonthButton: {
-    backgroundColor: '#007bff',
-  },
-  disabledMonth: {
-    opacity: 0.3,
+    alignItems: 'center',
+    borderRadius: 8,
+    margin: '1.66%',
   },
   monthText: {
     fontSize: 14,
     color: '#333',
   },
-  currentMonthText: {
-    fontWeight: 'bold',
+  selectedMonthButton: {
+    backgroundColor: '#007bff',
   },
   selectedMonthText: {
     color: '#fff',
@@ -484,31 +522,41 @@ const styles = StyleSheet.create({
   },
   yearButton: {
     width: '30%',
-    paddingVertical: 12,
-    alignItems: 'center',
+    height: 45,
     justifyContent: 'center',
-    marginBottom: 8,
-    borderRadius: 4,
-  },
-  currentYearButton: {
-    backgroundColor: '#f0f0f0',
-  },
-  selectedYearButton: {
-    backgroundColor: '#007bff',
-  },
-  disabledYear: {
-    opacity: 0.3,
+    alignItems: 'center',
+    borderRadius: 8,
+    margin: '1.66%',
   },
   yearText: {
     fontSize: 14,
     color: '#333',
   },
-  currentYearText: {
-    fontWeight: 'bold',
+  selectedYearButton: {
+    backgroundColor: '#007bff',
   },
   selectedYearText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  modalFooter: {
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    padding: 15,
+    alignItems: 'center',
+  },
+  confirmButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 

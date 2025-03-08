@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { CalendarHeaderProps } from './types';
-import { FontAwesome } from '@expo/vector-icons';
+import * as Icons from '@expo/vector-icons';
 
 // Ekran genişliğini al
 const { width } = Dimensions.get('window');
@@ -48,118 +48,111 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   const getFormattedTitle = useCallback((currentDate: Date) => {
     if (title) return title;
     
-    // Her durumda Gün Ay formatı
-    return `${currentDate.getDate()} ${MONTHS[currentDate.getMonth()]}`;
+    const month = MONTHS[currentDate.getMonth()];
+    const year = currentDate.getFullYear();
+    return `${month} ${year}`;
   }, [title]);
   
-  // Dışarıdan gelen tarih değiştiğinde, seçili tarihi ve başlığı güncelle
+  // Tarih değiştiğinde başlığı güncelle
   useEffect(() => {
-    setSelectedDateInWeek(new Date(date));
     setCurrentTitle(getFormattedTitle(date));
   }, [date, getFormattedTitle]);
   
-  // Haftanın günlerini ve tarihlerini oluştur
+  // Haftalık görünüm için gün hesaplamaları
+  const [weekDays, setWeekDays] = useState<Date[]>([]);
+  
+  // Haftalık görünüm için tarihleri hesapla
   const getWeekDays = () => {
-    // Mevcut tarihin bulunduğu haftanın ilk gününü (Pazartesi) bul
-    const currentDate = new Date(date);
-    const day = currentDate.getDay(); // 0: Pazar, 1: Pazartesi...
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Pazartesi'den başla
     
-    // Pazartesi'yi haftanın ilk günü olarak ayarla
-    const firstDayOfWeek = new Date(currentDate);
-    const mondayOffset = day === 0 ? -6 : 1 - day; // Pazar ise -6, diğer günler için 1-gün
-    firstDayOfWeek.setDate(currentDate.getDate() + mondayOffset);
+    const monday = new Date(d.setDate(diff));
     
-    // Haftanın günlerini oluştur
-    const weekDays = [];
+    // Pazartesiden başlayarak 7 gün oluştur
+    const days = [];
     for (let i = 0; i < 7; i++) {
-      const weekDay = new Date(firstDayOfWeek);
-      weekDay.setDate(firstDayOfWeek.getDate() + i);
-      weekDays.push(weekDay);
+      const newDay = new Date(monday);
+      newDay.setDate(monday.getDate() + i);
+      days.push(newDay);
     }
     
-    return weekDays;
+    return days;
   };
   
-  const weekDays = getWeekDays();
-
+  // Tarihi güncelleştir ve haftalık günleri güncelle
+  useEffect(() => {
+    setWeekDays(getWeekDays());
+  }, [date]);
+  
   // Haftalık görünümü aç/kapat
   const toggleWeekView = () => {
     setWeekViewVisible(!weekViewVisible);
   };
   
-  // Üst butonlar için gezinme fonksiyonları
+  // Önceki ay/hafta
   const handleTopPrevious = () => {
-    if (weekViewVisible) {
-      // Haftalık görünüm açıkken, bir hafta geriye git
-      const newDate = new Date(date);
-      newDate.setDate(date.getDate() - 7);
-      if (onPrevious) onPrevious(newDate);
-    } else {
-      // Haftalık görünüm kapalıyken, bir gün geriye git
-      const newDate = new Date(date);
-      newDate.setDate(date.getDate() - 1);
-      if (onPrevious) onPrevious(newDate);
-    }
-  };
-
-  const handleTopNext = () => {
-    if (weekViewVisible) {
-      // Haftalık görünüm açıkken, bir ay ileriye git
-      const newDate = new Date(date);
-      newDate.setMonth(date.getMonth() + 1);
-      if (onNext) onNext(newDate);
-    } else {
-      // Haftalık görünüm kapalıyken, bir gün ileriye git
-      const newDate = new Date(date);
-      newDate.setDate(date.getDate() + 1);
-      if (onNext) onNext(newDate);
-    }
-  };
-
-  // Haftalık görünümdeki alt butonlar için gezinme fonksiyonları
-  const handleWeekPrevious = () => {
-    // Bir hafta geriye git
-    const newDate = new Date(date);
-    newDate.setDate(date.getDate() - 7); // Tam bir hafta geriye git
     if (onPrevious) {
-      // Haftanın başlangıç gününe göre ayarla
-      const day = newDate.getDay(); // 0: Pazar, 1: Pazartesi, ...
-      const mondayOffset = day === 0 ? -6 : 1 - day; // Pazarsa -6, diğer günler için 1-gün
-      newDate.setDate(newDate.getDate() + mondayOffset); // Haftanın başlangıcına ayarla
+      const newDate = new Date(date);
+      
+      // Geri git
+      newDate.setMonth(newDate.getMonth() - 1);
+      
+      // Ana uygulamaya bildir
       onPrevious(newDate);
     }
   };
-
-  const handleWeekNext = () => {
-    // Bir hafta ileriye git
-    const newDate = new Date(date);
-    newDate.setDate(date.getDate() + 7); // Tam bir hafta ileriye git
+  
+  // Sonraki ay/hafta
+  const handleTopNext = () => {
     if (onNext) {
-      // Haftanın başlangıç gününe göre ayarla
-      const day = newDate.getDay(); // 0: Pazar, 1: Pazartesi, ...
-      const mondayOffset = day === 0 ? -6 : 1 - day; // Pazarsa -6, diğer günler için 1-gün
-      newDate.setDate(newDate.getDate() + mondayOffset); // Haftanın başlangıcına ayarla
+      const newDate = new Date(date);
+      
+      // İleri git
+      newDate.setMonth(newDate.getMonth() + 1);
+      
+      // Ana uygulamaya bildir
+      onNext(newDate);
+    }
+  };
+  
+  // Haftalık görünümde önceki hafta
+  const handleWeekPrevious = () => {
+    if (onPrevious) {
+      const newDate = new Date(date);
+      
+      // 7 gün geriye git
+      newDate.setDate(newDate.getDate() - 7);
+      
+      // Ana uygulamaya bildir
+      onPrevious(newDate);
+    }
+  };
+  
+  // Haftalık görünümde sonraki hafta
+  const handleWeekNext = () => {
+    if (onNext) {
+      const newDate = new Date(date);
+      
+      // 7 gün ileriye git
+      newDate.setDate(newDate.getDate() + 7);
+      
+      // Ana uygulamaya bildir
       onNext(newDate);
     }
   };
   
   return (
-    <View style={styles.container}>
-      {/* Üst kısım: Logo, Ay/Yıl seçimi ve Bildirimler */}
-      <View style={styles.topBar}>
-        {/* Sol bölüm - Özelleştirilebilir */}
-        <TouchableOpacity 
-          style={styles.logoContainer}
-          onPress={onLeftPress}
-        >
-          {leftContent ? (
-            leftContent
-          ) : (
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>K</Text>
-            </View>
+    <View style={[styles.container, theme && theme.backgroundColor ? { backgroundColor: theme.backgroundColor } : null]}>
+      <View style={styles.topRow}>
+        {/* Sol içerik alanı */}
+        <View style={styles.sideContainer}>
+          {leftContent && (
+            <TouchableOpacity onPress={onLeftPress}>
+              {leftContent}
+            </TouchableOpacity>
           )}
-        </TouchableOpacity>
+        </View>
         
         {/* Gün Ay Seçimi - Tıklandığında haftalık görünümü aç/kapat */}
         <TouchableOpacity 
@@ -171,7 +164,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             onPress={handleTopPrevious}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <FontAwesome name="chevron-left" size={16} color="#000" />
+            <Icons.FontAwesome name="chevron-left" size={16} color="#000" />
           </TouchableOpacity>
           
           <Text style={styles.monthYearText}>{currentTitle}</Text>
@@ -181,26 +174,18 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             onPress={handleTopNext}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <FontAwesome name="chevron-right" size={16} color="#000" />
+            <Icons.FontAwesome name="chevron-right" size={16} color="#000" />
           </TouchableOpacity>
         </TouchableOpacity>
         
-        {/* Sağ bölüm - Özelleştirilebilir */}
-        <TouchableOpacity 
-          style={styles.notificationsButton}
-          onPress={onRightPress}
-        >
-          {rightContent ? (
-            rightContent
-          ) : (
-            <>
-              <FontAwesome name="envelope-o" size={20} color="#000" />
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationText}>3</Text>
-              </View>
-            </>
+        {/* Sağ içerik alanı */}
+        <View style={styles.sideContainer}>
+          {rightContent && (
+            <TouchableOpacity onPress={onRightPress}>
+              {rightContent}
+            </TouchableOpacity>
           )}
-        </TouchableOpacity>
+        </View>
       </View>
       
       {/* Alt kısım: Günlük gezinme - Görünürlüğü toggle edilebilen, 7 gün kompakt görünüm */}
@@ -210,7 +195,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             style={styles.dayArrow}
             onPress={handleWeekPrevious}
           >
-            <FontAwesome name="chevron-left" size={16} color="#000" />
+            <Icons.FontAwesome name="chevron-left" size={16} color="#000" />
           </TouchableOpacity>
           
           <View style={styles.daysContainer}>
@@ -257,12 +242,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             style={styles.dayArrow}
             onPress={handleWeekNext}
           >
-            <FontAwesome name="chevron-right" size={16} color="#000" />
+            <Icons.FontAwesome name="chevron-right" size={16} color="#000" />
           </TouchableOpacity>
         </View>
       )}
       
-      {/* Gölge çizgisi */}
+      {/* Alt çizgi - Görsel ayrıştırıcı */}
       <View style={styles.shadowLine} />
     </View>
   );
@@ -272,31 +257,16 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
   },
-  topBar: {
+  topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
   },
-  logoContainer: {
+  sideContainer: {
     width: 40,
-    alignItems: 'flex-start',
-  },
-  logo: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#333',
-    alignItems: 'center',
     justifyContent: 'center',
-    transform: [{ rotate: '45deg' }],
-  },
-  logoText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 18,
-    transform: [{ rotate: '-45deg' }],
   },
   monthYearSelector: {
     flexDirection: 'row',
@@ -310,27 +280,6 @@ const styles = StyleSheet.create({
   },
   arrowButton: {
     padding: 5,
-  },
-  notificationsButton: {
-    width: 40,
-    alignItems: 'flex-end',
-    position: 'relative',
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -5,
-    right: -5,
-    backgroundColor: '#FF5252',
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  notificationText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   daySelector: {
     flexDirection: 'row',

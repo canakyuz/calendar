@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { CalendarHeaderProps } from './types';
-import * as Icons from '@expo/vector-icons';
 
 // Ayları formatlama
 const MONTHS = [
@@ -18,7 +17,7 @@ interface NavbarCalendarViewProps extends CalendarHeaderProps {
   selectedDate?: Date;
 }
 
-const NavbarCalendarView: React.FC<NavbarCalendarViewProps> = ({
+const NavbarCalendarViewFixed: React.FC<NavbarCalendarViewProps> = ({
   date,
   onPrevious,
   onNext,
@@ -109,7 +108,7 @@ const NavbarCalendarView: React.FC<NavbarCalendarViewProps> = ({
           style={styles.button} 
           onPress={() => onPrevious && onPrevious()}
         >
-          <Icons.FontAwesome name="chevron-left" size={16} color="#333" />
+          <Text style={{fontSize: 16}}>◀</Text>
         </TouchableOpacity>
         
         <Text style={styles.title}>
@@ -120,7 +119,7 @@ const NavbarCalendarView: React.FC<NavbarCalendarViewProps> = ({
           style={styles.button} 
           onPress={() => onNext && onNext()}
         >
-          <Icons.FontAwesome name="chevron-right" size={16} color="#333" />
+          <Text style={{fontSize: 16}}>▶</Text>
         </TouchableOpacity>
       </View>
       
@@ -270,4 +269,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default NavbarCalendarView; 
+export default NavbarCalendarViewFixed; 
